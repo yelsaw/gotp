@@ -15,7 +15,7 @@ Clone the repo, build or run the app.
 
 Store and retrieve
 ```
-go run <otp-key> <full-hotp-url> 
+go run <otp-string-key> <full-totp-url> 
 ```
 Retrieve only
 ```
