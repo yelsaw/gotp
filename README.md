@@ -1,7 +1,7 @@
 # One Time Password (OTP) App 
 
 ## Why another OTP app?
-Authy (Twillio) no longer supports their desktop app and recently upon launch of the app the message "Device Removed" was received and there's no way to reconnect due to the message "The device does not meet the minimum integrity requirements" and thus sparked the [GOTP](https://github.com/yelsaw/gotp) project for simple desktop use.
+Authy (Twillio) no longer supports their desktop app and recently upon launch of the app the message "Device Removed" was received and there's no way to reconnect due to the message "The device does not meet the minimum integrity requirements" thus began the [GOTP](https://github.com/yelsaw/gotp) project for simple desktop use.
 
 ## What to expect?
 This is a no frills OTP application which only supports TOTP.
