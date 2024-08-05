@@ -13,11 +13,16 @@ As mentioned, only supports [Time-based one-time password](https://en.wikipedia.
 ## Getting started
 Clone the repo, build or run the app.
 
-Store and retrieve
+OTP code from URL
 ```
-go run <otp-string-key> <full-totp-url> 
+go run main.go <full-totp-url>
 ```
-Retrieve only
+
+Returns:
 ```
-go run <otp-key>
+Token: 123456
+Expires in 30 seconds
+
+Press q to quit
+
 ```
