@@ -16,7 +16,7 @@ Clone the repo, build or run the app.
 OTP code from URL
 otpath provided is an example of a parsed QRCode from a service.
 ```
-run main.go "otpauth://totp/AppName:you@youremail.com?algorithm=SHA1&digits=6&issuer=AppName&period=30&secret=SECRET_STRING"
+go run main.go "otpauth://totp/AppName:you@youremail.com?algorithm=SHA1&digits=6&issuer=AppName&period=30&secret=SECRET_STRING"
 ```
 
 Returns:
