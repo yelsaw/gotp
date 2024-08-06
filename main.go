@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/pquerna/otp/totp"
 	"log"
 	"net/url"
 	"os"
 	"strconv"
 	"time"
-
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/pquerna/otp/totp"
 )
 
 type messageData struct {
@@ -116,5 +116,9 @@ func (m messageData) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // Bubble Tea: View()
 func (m messageData) View() string {
-	return fmt.Sprintf("\n\nToken: %s\nExpires in %d seconds\n\nPress q to quit\n\n\n", m.code, m.countdown)
+	style := lipgloss.NewStyle().Foreground(lipgloss.Color("#FFDD00")).Bold(true)
+	code := style.Render(m.code)
+	count := style.Render(strconv.Itoa(m.countdown))
+	text := fmt.Sprintf("\n\n\nToken: %s\n\nExpires in %s seconds\n\nPress q to quit\n\n", code, count)
+	return text
 }
