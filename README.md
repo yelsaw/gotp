@@ -1,4 +1,4 @@
-# One Time Password (OTP) App 
+# One-Time Password (OTP) App
 
 ## Why another OTP app?
 Authy (Twillio) no longer supports their desktop app and recently upon launch of the app the message "Device Removed" was received and there's no way to reconnect due to the message "The device does not meet the minimum integrity requirements" thus began the [GOTP](https://github.com/yelsaw/gotp) project for simple desktop use.
@@ -14,8 +14,9 @@ As mentioned, only supports [Time-based one-time password](https://en.wikipedia.
 Clone the repo, build or run the app.
 
 OTP code from URL
+otpath provided is an example of a parsed QRCode from a service.
 ```
-go run main.go <full-totp-url>
+run main.go "otpauth://totp/AppName:you@youremail.com?algorithm=SHA1&digits=6&issuer=AppName&period=30&secret=SECRET_STRING"
 ```
 
 Returns:
