@@ -1,10 +1,11 @@
+VERSION := v0.0.1
 APP := gotp
 GO_LDFLAGS="-s -extldflags=-static"
 
 _: linux darwin windows
-	tar cfv gotp-linux_v0.0.1.tar build/linux/*
-	tar cfv gotp-darwin_v0.0.1.tar build/darwin/*
-	zip gotp-windows_v0.0.1.zip build/windows/*
+	tar cfv gotp-linux_$(VERSION).tar build/linux/*
+	tar cfv gotp-darwin_$(VERSION).tar build/darwin/*
+	zip gotp-windows_$(VERSION).zip build/windows/*
 
 clean:
 	rm -rf build
