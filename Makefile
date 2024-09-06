@@ -1,33 +1,28 @@
-VERSION := v0.0.1
 APP := gotp
 GO_LDFLAGS="-s -extldflags=-static"
 
-_: linux darwin windows
-	tar cfv gotp-linux_$(VERSION).tar build/linux/*
-	tar cfv gotp-darwin_$(VERSION).tar build/darwin/*
-	zip gotp-windows_$(VERSION).zip build/windows/*
+_: rmbuild linux darwin windows
+	tar cfv build/gotp-linux_v0.0.1.tar build/$(APP)-linux
+	tar cfv build/gotp-darwin_v0.0.1.tar build/$(APP)-darwin
+	zip build/gotp-windows_v0.0.1.zip build/$(APP).exe
 
-clean:
+rmbuild:
 	rm -rf build
 
-linux:
+clean:
 	@echo "Building ..."
 	go clean
-	go get
-	@GOOS=linux CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o build/linux/$(APP)-linux
+	go get	
+
+linux: clean
+	@GOOS=linux CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o build/$(APP)-linux
 	@echo "finished"
 
-darwin:
-	@echo "Building ..."
-	go clean
-	go get
-	@GOOS=darwin go build -ldflags=$(GO_LDFLAGS) -o build/darwin/$(APP)-darwin
+darwin: clean
+	@GOOS=darwin go build -ldflags=$(GO_LDFLAGS) -o build/$(APP)-darwin
 	@echo "finished"
 
-windows:
-	@echo "Building ..."
-	go clean
-	go get
-	@GOOS=windows go build -ldflags=$(GO_LDFLAGS) -o build/windows/$(APP).exe
+windows: clean
+	@GOOS=windows go build -ldflags=$(GO_LDFLAGS) -o build/$(APP).exe
 	@echo "finished"
 
