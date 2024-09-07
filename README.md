@@ -11,6 +11,14 @@ In the future this project may become more end-user friendly, but for now it's b
 As mentioned, only supports [Time-based one-time password](https://en.wikipedia.org/wiki/Time-based_one-time_password) not [HMAC-based one-time password](https://en.wikipedia.org/wiki/HMAC-based_one-time_password)
 
 ## Getting started
+
+Navigate to the [Releases Page](https://github.com/yelsaw/gotp/releases) and download the code, or use a pre-compiled binary for your OS.
+ - Linux (Tested on Debian)
+ - Darwin (Tested on Intel and M3)
+ - Windows (Untested as of first release)
+
+*OR*
+
 Clone the repo, build or run the app.
 
 OTP code from URL
