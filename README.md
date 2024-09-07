@@ -36,6 +36,6 @@ Press q to quit
 
 ```
 
-# AUTHOR
+## AUTHOR
 
 Yelsaw (gotp@yelsaw.com)
