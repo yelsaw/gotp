@@ -35,3 +35,7 @@ Expires in 30 seconds
 Press q to quit
 
 ```
+
+# AUTHOR
+
+Yelsaw (gotp@yelsaw.com)
