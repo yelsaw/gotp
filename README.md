@@ -42,4 +42,4 @@ Yelsaw (gotp@yelsaw.com)
 
 ## License
 
-This project is licensed under the MIT - see the [LICENSE](https://github.com/yelsaw/gotp/blob/main/LICENSE) file for details.
+This project is licensed under the MIT license - see the [LICENSE](https://github.com/yelsaw/gotp/blob/main/LICENSE) file for details.
