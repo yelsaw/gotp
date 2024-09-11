@@ -14,7 +14,7 @@ As mentioned, only supports [Time-based one-time password](https://en.wikipedia.
 
 Navigate to the [Releases Page](https://github.com/yelsaw/gotp/releases) and download the code, or use a pre-compiled binary for your OS.
  - Linux (Tested on Debian)
- - Darwin (Tested on Intel and M3)
+ - Darwin (Tested on Intel and M-series)
  - Windows (Untested as of first release)
 
 *OR*
