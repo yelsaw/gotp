@@ -4,6 +4,7 @@ OS_BUILDS = linux darwin windows
 APP := gotp
 BUILD_DIR := "build"
 SHA_FILE := $(APP)-sha256.txt
+LIC_FILE := LICENSE
 
 GO_LDFLAGS = "-s -extldflags=-static"
 
@@ -26,10 +27,12 @@ archive:
 	@for os in $(OS_BUILDS); do \
 		if [ "$$os" = "windows" ]; then \
 			echo "Creating zip archive for $$os"; \
+			cp -a $(LIC_FILE) $(BUILD_DIR)/$$os/$(LIC_FILE).txt; \
 			zip -r $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip -j $(BUILD_DIR)/$$os/; \
 		else \
 			echo "Creating tar archive for $$os"; \
-			tar -cf $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar -C $(BUILD_DIR)/$$os $(APP) $(SHA_FILE); \
+			cp -a $(LIC_FILE) $(BUILD_DIR)/$$os/; \
+			tar -cf $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar -C $(BUILD_DIR)/$$os $(APP) $(LIC_FILE) $(SHA_FILE); \
 		fi \
 	done
 
