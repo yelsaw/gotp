@@ -36,6 +36,32 @@ Press q to quit
 
 ```
 
+## Build tool
+
+Build binaries from source for target OS with
+ 
+ - `make build`
+ - `make linux`
+ - `make darwin`
+ - `make windows`
+
+
+```
+:~/src/gotp$ make
+
+  Command         Description
+  -------         -----------
+  build            Builds all binaries to BUILD_DIR/{linux,darwin,windows}
+  dist             Builds all binaries, archives with LIC_FILE, and creates sha256sum
+  linux            Builds binary and outputs to BUILD_DIR/linux
+  darwin           Builds binary and outputs to BUILD_DIR/darwin
+  windows          Builds binary and outputs to BUILD_DIR/windows
+  archive          Create archives for distribution
+  checksum         Create sha256sum(s) for distribution
+  clean            Remove BUILD_DIR
+
+```
+
 ## AUTHOR
 
 Yelsaw (gotp@yelsaw.com)
