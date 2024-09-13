@@ -9,29 +9,32 @@ LIC_FILE = LICENSE
 
 GO_LDFLAGS = "-s -extldflags=-static"
 
-# Builds all binaries to BUILD_DIR/{linux,darwin,windows}
-build: clean $(OS_BUILDS)
+.PHONY: help clean build dist linux darwin windows archive checksum
 
-# Builds all binaries, archives with LIC_FILE, and creates sha256sum
-dist: clean $(OS_BUILDS) archive checksum
+help:
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*#' $(MAKEFILE_LIST) | \
+	awk 'BEGIN {FS = ":.*#"; printf "  %-15s %s\n", "Command", "Description"; printf "  %-15s %s\n", "-------", "-----------"} {printf "  %-15s %s\n", $$1, $$2}'
+	@echo ""
 
-# Builds binary and outputs to BUILD_DIR/linux
-linux:
+build: clean $(OS_BUILDS) # Builds all binaries to BUILD_DIR/{linux,darwin,windows}
+
+dist: clean $(OS_BUILDS) archive checksum # Builds all binaries, archives with LIC_FILE, and creates sha256sum 
+	
+
+linux: # Builds binary and outputs to BUILD_DIR/linux
 	@GOOS=linux CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o build/linux/$(APP)
 	@echo "output build/linux/$(APP)"
 
-# Builds binary and outputs to BUILD_DIR/darwin
-darwin:
+darwin: # Builds binary and outputs to BUILD_DIR/darwin
 	@GOOS=darwin go build -ldflags=$(GO_LDFLAGS) -o build/darwin/$(APP)
 	@echo "output build/darwin/$(APP)"
 
-# Builds binary and outputs to BUILD_DIR/windows
-windows:
+windows: # Builds binary and outputs to BUILD_DIR/windows
 	@GOOS=windows go build -ldflags=$(GO_LDFLAGS) -o build/windows/$(APP).exe
 	@echo "output build/windows/$(APP).exe"
 
-# Creates archives for distribution
-archive:
+archive: # Create archives for distribution
 	@echo "Creating tar/zip archives"
 	@for os in $(OS_BUILDS); do \
 			echo "Creating zip archive for $$os"; \
@@ -44,8 +47,7 @@ archive:
 		fi \
 	done
 
-# Creates sha256sum for distribution
-checksum:
+checksum: # Create sha256sum(s) for distribution
 	@echo "Creating checksum hashes"
 	@for os in $(OS_BUILDS); do \
 			if [ "$$os" = "windows" ]; then \
@@ -55,7 +57,9 @@ checksum:
 			fi \
 	done
 
-# Removes BUILD_DIR
-clean:
-	@echo "Removing $(BUILD_DIR) dir"
-	@rm -rf $(BUILD_DIR)
+clean: # Remove BUILD_DIR
+	@if [ -d $(BUILD_DIR) ]; then \
+		echo "Removing $(BUILD_DIR) dir"; \
+		rm -rf $(BUILD_DIR); \
+	fi \
+
