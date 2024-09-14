@@ -13,8 +13,8 @@ GO_LDFLAGS = "-s -extldflags=-static"
 
 help:
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*#' $(MAKEFILE_LIST) | \
-	awk 'BEGIN {FS = ":.*#"; printf "  %-15s %s\n", "Command", "Description"; printf "  %-15s %s\n", "-------", "-----------"} {printf "  %-15s %s\n", $$1, $$2}'
+	@grep -E '^[sa-zA-Z_-]+:.*#' $(MAKEFILE_LIST) | \
+	awk 'BEGIN {FS = ":.*# "; printf "  %-15s %s\n", "Command", "Description"; printf "  %-15s %s\n", "-------", "-----------"} {printf "  %-15s %s\n", $$1, $$2}'
 	@echo ""
 
 build: clean $(OS_BUILDS) # Builds all binaries to BUILD_DIR/{linux,darwin,windows}
