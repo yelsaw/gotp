@@ -23,15 +23,15 @@ dist: clean $(OS_BUILDS) archive checksum # Builds all binaries, archives with L
 
 linux: # Builds binary and outputs to BUILD_DIR/linux
 	@GOOS=linux CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/linux/$(APP)
-	@echo "output build/linux/$(APP)"
+	@echo "output $(BUILD_DIR)/linux/$(APP)"
 
 darwin: # Builds binary and outputs to BUILD_DIR/darwin
 	@GOOS=darwin go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/darwin/$(APP)
-	@echo "output build/darwin/$(APP)"
+	@echo "output $(BUILD_DIR)/darwin/$(APP)"
 
 windows: # Builds binary and outputs to BUILD_DIR/windows
 	@GOOS=windows go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/windows/$(APP).exe
-	@echo "output build/windows/$(APP).exe"
+	@echo "output $(BUILD_DIR)/windows/$(APP).exe"
 
 archive: # Create archives for distribution
 	@echo "Creating tar/zip archives"
