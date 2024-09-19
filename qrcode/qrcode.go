@@ -55,7 +55,7 @@ func ImagePath(path string) (string, error) {
 		return grayScale, width, height
 	}(img)
 
-	// Scan image with zbar using using the go image ref
+	// Scan image with zbar using go image ref
 	cData := (*C.uchar)(unsafe.Pointer(&grayMatter[0]))
 	image := C.go_zbar_scan_image(cData, C.uint(width), C.uint(height))
 
