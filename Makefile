@@ -22,7 +22,7 @@ build: clean $(OS_BUILDS) # Builds all binaries to BUILD_DIR/{linux,darwin,windo
 dist: clean $(OS_BUILDS) archive checksum # Builds all binaries, archives with LIC_FILE, and creates sha256sum 
 
 linux: # Builds binary and outputs to BUILD_DIR/linux
-	@GOOS=linux CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/linux/$(APP)
+	@GOOS=linux CGO_ENABLED=1 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/linux/$(APP)
 	@echo "output $(BUILD_DIR)/linux/$(APP)"
 
 darwin: # Builds binary and outputs to BUILD_DIR/darwin
