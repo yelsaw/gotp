@@ -29,6 +29,9 @@ import (
 	"unsafe"
 )
 
+// Reads an image file by path and scans the image for QR codes using
+// the ZBar library with compiled C code using cgo.
+// In order to use this package the host machine must have libzbar-dev installed.
 func ImagePath(path string) (string, error) {
 	qrCode, err := os.Open(path)
 	if err != nil {
