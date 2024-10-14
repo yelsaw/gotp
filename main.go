@@ -1,21 +1,23 @@
 package main
 
 import (
+	"encoding/base32"
 	"fmt"
 	"log"
-	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 )
 
 type messageData struct {
 	secret    string
-	period    int
+	period    uint64
 	code      string
 	countdown int
 	ticker    *time.Ticker
@@ -26,35 +28,39 @@ func main() {
 		log.Fatalf("First arg requires: %s <full-totp-url>", os.Args[0])
 	}
 
-	otpUrl := os.Args[1]
-	u, err := url.Parse(otpUrl)
+	url := os.Args[1]
 
+	message, err := urlParser(url)
 	if err != nil {
-		log.Fatalf("Unable to parse 'totp' url: %v", err)
+		log.Fatal(err)
 	}
 
-	secret := u.Query().Get("secret")
-	if secret == "" {
-		log.Fatalf("Missing 'secret' from url")
+	if _, err := tea.NewProgram(message).Run(); err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+// Calls otp.NewKeyFromURL() and parses keys into messageData struct
+func urlParser(url string) (*messageData, error) {
+	key, err := otp.NewKeyFromURL(url)
+	if err != nil {
+		return nil, err
+	}
+	secret := key.Secret()
+
+	_, err = base32.StdEncoding.DecodeString(strings.ToUpper(secret))
+	if err != nil {
+		return nil, fmt.Errorf("secret is invalid: %v", err)
 	}
 
-	periodParam := u.Query().Get("period")
-	period := 30
-	if periodParam != "" {
-		period, err = strconv.Atoi(periodParam)
-		if err != nil {
-			log.Fatalf("Invalid 'period' parameter: %v", err)
-		}
+	message := &messageData{
+		secret: secret,
+		period: key.Period(),
+		ticker: time.NewTicker(time.Second),
 	}
 
-	if _, err = tea.NewProgram(messageData{
-		secret:    secret,
-		period:    period,
-		countdown: period,
-		ticker:    time.NewTicker(time.Second),
-	}).Run(); err != nil {
-		log.Fatalf("Error running program: %v", err)
-	}
+	return message, nil
 }
 
 func getCode(secret string) tea.Cmd {
@@ -95,7 +101,7 @@ func (m messageData) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case codeMsg:
 		m.code = msg.code
-		m.countdown = m.period
+		m.countdown = int(m.period)
 		return m, tickCmd(m.ticker)
 	case time.Time:
 		m.countdown--
