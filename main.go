@@ -1,20 +1,25 @@
 package main
 
 import (
+	"encoding/base32"
 	"fmt"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/pquerna/otp/totp"
 	"log"
-	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
+
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/pquerna/otp"
+	"github.com/pquerna/otp/totp"
 )
 
 type messageData struct {
+	provider  string
 	secret    string
-	period    int
+	account   string
+	period    uint64
 	code      string
 	countdown int
 	ticker    *time.Ticker
@@ -25,41 +30,47 @@ func main() {
 		log.Fatalf("First arg requires: %s <full-totp-url>", os.Args[0])
 	}
 
-	otpUrl := os.Args[1]
-	u, err := url.Parse(otpUrl)
+	url := os.Args[1]
 
+	message, err := urlParser(url)
 	if err != nil {
-		log.Fatalf("Unable to parse 'totp' url: %v", err)
+		log.Fatal(err)
 	}
 
-	secret := u.Query().Get("secret")
-	if secret == "" {
-		log.Fatalf("Missing 'secret' from url")
-	}
-
-	periodParam := u.Query().Get("period")
-	period := 30
-	if periodParam != "" {
-		period, err = strconv.Atoi(periodParam)
-		if err != nil {
-			log.Fatalf("Invalid 'period' parameter: %v", err)
-		}
-	}
-
-	program := tea.NewProgram(initData(secret, period))
-	if err := program.Start(); err != nil {
+	if _, err := tea.NewProgram(message).Run(); err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 }
 
-func initData(secret string, period int) messageData {
-	return messageData{
-		secret:    secret,
-		period:    period,
-		countdown: period,
-		ticker:    time.NewTicker(time.Second),
+// Calls otp.NewKeyFromURL() and parses keys into messageData struct
+func urlParser(url string) (*messageData, error) {
+	key, err := otp.NewKeyFromURL(url)
+	if err != nil {
+		return nil, err
 	}
+	secret := key.Secret()
+
+	_, err = base32.StdEncoding.DecodeString(strings.ToUpper(secret))
+	if err != nil {
+		return nil, fmt.Errorf("secret is invalid: %v", err)
+	}
+
+	message := &messageData{
+		provider: getProvider(url),
+		account:  key.AccountName(),
+		secret:   secret,
+		period:   key.Period(),
+		ticker:   time.NewTicker(time.Second),
+	}
+
+	return message, nil
+}
+
+func getProvider(url string) string {
+	colon := strings.Split(url, ":")
+	slash := strings.Split(colon[1], "/")
+	return slash[3]
 }
 
 func getCode(secret string) tea.Cmd {
@@ -100,7 +111,7 @@ func (m messageData) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case codeMsg:
 		m.code = msg.code
-		m.countdown = m.period
+		m.countdown = int(m.period)
 		return m, tickCmd(m.ticker)
 	case time.Time:
 		m.countdown--
@@ -116,9 +127,23 @@ func (m messageData) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // Bubble Tea: View()
 func (m messageData) View() string {
-	style := lipgloss.NewStyle().Foreground(lipgloss.Color("#FFDD00")).Bold(true)
-	code := style.Render(m.code)
-	count := style.Render(strconv.Itoa(m.countdown))
-	text := fmt.Sprintf("\n\n\nToken: %s\n\nExpires in %s seconds\n\nPress q to quit\n\n", code, count)
-	return text
+
+	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("#FFDD00"))
+	lime := lipgloss.NewStyle().Foreground(lipgloss.Color("#5CDE73"))
+	provider := lipgloss.NewStyle().Bold(true).Render(m.provider)
+	account := lime.Render(m.account)
+	code := yellow.Bold(true).Render(m.code)
+	count := yellow.Render(strconv.Itoa(m.countdown))
+	const arrow = "\u2192"
+
+	text := fmt.Sprintf(`
+%s %s %s 
+
+Token: %s 
+
+Regenerates in %s seconds
+
+Press q to quit`, account, arrow, provider, code, count)
+
+	return lipgloss.NewStyle().Padding(0, 1, 1).Render(text)
 }

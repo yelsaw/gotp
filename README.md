@@ -24,15 +24,18 @@ Clone the repo, build or run the app.
 OTP code from URL
 otpath provided is an example of a parsed QRCode from a service.
 ```
-go run main.go "otpauth://totp/AppName:you@youremail.com?algorithm=SHA1&digits=6&issuer=AppName&period=30&secret=SECRET_STRING"
+go run main.go "otpauth://totp/Microsoft:you@youremail.com?algorithm=SHA1&digits=6&issuer=Microsoft&period=30&secret=VXYU6YKSNBZELU23"
 ```
 
 Returns:
 ```
-Token: 123456
-Expires in 30 seconds
+ you@youremail.com → Microsoft
 
-Press q to quit
+ Token: 423157
+
+ Regenerates in 30 seconds
+
+ Press q to quit
 
 ```
 
