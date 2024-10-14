@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/pquerna/otp/totp"
 	"log"
 	"net/url"
 	"os"
 	"strconv"
 	"time"
+
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/pquerna/otp/totp"
 )
 
 type messageData struct {
@@ -46,19 +47,13 @@ func main() {
 		}
 	}
 
-	program := tea.NewProgram(initData(secret, period))
-	if err := program.Start(); err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
-}
-
-func initData(secret string, period int) messageData {
-	return messageData{
+	if _, err = tea.NewProgram(messageData{
 		secret:    secret,
 		period:    period,
 		countdown: period,
 		ticker:    time.NewTicker(time.Second),
+	}).Run(); err != nil {
+		log.Fatalf("Error running program: %v", err)
 	}
 }
 
