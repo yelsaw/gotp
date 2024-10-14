@@ -16,7 +16,9 @@ import (
 )
 
 type messageData struct {
+	provider  string
 	secret    string
+	account   string
 	period    uint64
 	code      string
 	countdown int
@@ -55,12 +57,20 @@ func urlParser(url string) (*messageData, error) {
 	}
 
 	message := &messageData{
-		secret: secret,
-		period: key.Period(),
-		ticker: time.NewTicker(time.Second),
+		provider: getProvider(url),
+		account:  key.AccountName(),
+		secret:   secret,
+		period:   key.Period(),
+		ticker:   time.NewTicker(time.Second),
 	}
 
 	return message, nil
+}
+
+func getProvider(url string) string {
+	colon := strings.Split(url, ":")
+	slash := strings.Split(colon[1], "/")
+	return slash[3]
 }
 
 func getCode(secret string) tea.Cmd {
@@ -117,9 +127,23 @@ func (m messageData) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // Bubble Tea: View()
 func (m messageData) View() string {
-	style := lipgloss.NewStyle().Foreground(lipgloss.Color("#FFDD00")).Bold(true)
-	code := style.Render(m.code)
-	count := style.Render(strconv.Itoa(m.countdown))
-	text := fmt.Sprintf("\n\n\nToken: %s\n\nExpires in %s seconds\n\nPress q to quit\n\n", code, count)
-	return text
+
+	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("#FFDD00"))
+	lime := lipgloss.NewStyle().Foreground(lipgloss.Color("#5CDE73"))
+	provider := lipgloss.NewStyle().Bold(true).Render(m.provider)
+	account := lime.Render(m.account)
+	code := yellow.Bold(true).Render(m.code)
+	count := yellow.Render(strconv.Itoa(m.countdown))
+	const arrow = "\u2192"
+
+	text := fmt.Sprintf(`
+%s %s %s 
+
+Token: %s 
+
+Regenerates in %s seconds
+
+Press q to quit`, account, arrow, provider, code, count)
+
+	return lipgloss.NewStyle().Padding(0, 1, 1).Render(text)
 }
