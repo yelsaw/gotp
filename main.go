@@ -15,6 +15,18 @@ import (
 	"github.com/pquerna/otp/totp"
 )
 
+func argParser(arg string) string {
+	if _, err := os.Stat(arg); err == nil {
+		data, err := os.ReadFile(arg)
+		if err != nil {
+			log.Fatalf("Unable to read known file path: %v", err)
+		}
+		return strings.TrimSpace(string(data))
+	}
+	// Just passing through
+	return arg
+}
+
 type messageData struct {
 	provider  string
 	secret    string
@@ -27,10 +39,10 @@ type messageData struct {
 
 func main() {
 	if len(os.Args) != 2 {
-		log.Fatalf("First arg requires: %s <full-totp-url>", os.Args[0])
+		log.Fatalf("First arg requires string or path")
 	}
 
-	url := os.Args[1]
+	url := argParser(os.Args[1])
 
 	message, err := urlParser(url)
 	if err != nil {
