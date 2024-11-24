@@ -1,7 +1,12 @@
 # One-Time Password (OTP) App
 
 ## Why another OTP app?
-Authy (Twillio) no longer supports their desktop app and recently upon launch of the app the message "Device Removed" was received and there's no way to reconnect due to the message "The device does not meet the minimum integrity requirements" thus began the [GOTP](https://github.com/yelsaw/gotp) project for simple desktop use.
+Authy (by Twillio) stopped supporting their desktop application in mid-2024. Upon launch of the app the message "Device Removed" was received and there's no way to reconnect due to the message "The device does not meet the minimum integrity requirements," thus began the [GOTP](https://github.com/yelsaw/gotp) project for simple desktop use.
+
+## Authy Desktop Death Rattle
+|EOL |Device Removed | Min requirements |
+|-|-|-|
+|![image](https://github.com/user-attachments/assets/836ccd37-1ce5-4367-adc1-76840d2c8ada)|![image](https://github.com/user-attachments/assets/0afc6091-ef71-47c2-8ac2-3aa72352cd7f)|![image](https://github.com/user-attachments/assets/de45815f-fce7-491b-9de5-4df365c19ab1)|
 
 ## What to expect?
 This is a no frills OTP application which only supports TOTP.
@@ -15,16 +20,23 @@ As mentioned, only supports [Time-based one-time password](https://en.wikipedia.
 Navigate to the [Releases Page](https://github.com/yelsaw/gotp/releases) and download the code, or use a pre-compiled binary for your OS.
  - Linux (Tested on Debian)
  - Darwin (Tested on Intel and M-series)
- - Windows (Untested as of first release)
+ - Windows (Tested on W11)
 
 *OR*
+
 
 Clone the repo, build or run the app.
 
 OTP code from URL
-otpath provided is an example of a parsed QRCode from a service.
+otpauth provided is an example of a parsed QRCode from a service.
 ```
 go run main.go "otpauth://totp/Microsoft:you@youremail.com?algorithm=SHA1&digits=6&issuer=Microsoft&period=30&secret=VXYU6YKSNBZELU23"
+```
+*OR* 
+
+Use OTP code from file path. `Make sure your file has a string similar to URL example.`
+```
+go run main.go ~/my-otp-file-path.txt
 ```
 
 Returns:
