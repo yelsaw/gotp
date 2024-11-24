@@ -20,16 +20,23 @@ As mentioned, only supports [Time-based one-time password](https://en.wikipedia.
 Navigate to the [Releases Page](https://github.com/yelsaw/gotp/releases) and download the code, or use a pre-compiled binary for your OS.
  - Linux (Tested on Debian)
  - Darwin (Tested on Intel and M-series)
- - Windows (Untested as of first release)
+ - Windows (Tested on W11)
 
 *OR*
+
 
 Clone the repo, build or run the app.
 
 OTP code from URL
-otpath provided is an example of a parsed QRCode from a service.
+otpauth provided is an example of a parsed QRCode from a service.
 ```
 go run main.go "otpauth://totp/Microsoft:you@youremail.com?algorithm=SHA1&digits=6&issuer=Microsoft&period=30&secret=VXYU6YKSNBZELU23"
+```
+*OR* 
+
+Use OTP code from file path. `Make sure your file has a string similar to URL example.`
+```
+go run main.go ~/my-otp-file-path.txt
 ```
 
 Returns:
