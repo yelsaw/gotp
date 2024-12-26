@@ -18,19 +18,19 @@ help:
 	awk 'BEGIN {FS = ":.*# "; printf "  %-15s %s\n", "Command", "Description"; printf "  %-15s %s\n", "-------", "-----------"} {printf "  %-15s %s\n", $$1, $$2}'
 	@echo ""
 
-build: clean $(OS_BUILDS) # Builds all binaries to BUILD_DIR/{linux,darwin,windows}
+build: clean $(OS_BUILDS) # Build to BUILD_DIR/{linux,darwin,windows}
 
-dist: clean $(OS_BUILDS) archive checksum # Builds all binaries, archives with LIC_FILE, and creates sha256sum 
+dist: clean $(OS_BUILDS) archive checksum # Build bins, create archives, and checksums
 
-linux: # Builds binary and outputs to BUILD_DIR/linux
+linux: # Build bin to BUILD_DIR/linux
 	@GOOS=linux CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/linux/$(APP)
 	@echo "output build/linux/$(APP)"
 
-darwin: # Builds binary and outputs to BUILD_DIR/darwin
+darwin: # Build bin to BUILD_DIR/darwin
 	@GOOS=darwin go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/darwin/$(APP)
 	@echo "output build/darwin/$(APP)"
 
-windows: # Builds binary and outputs to BUILD_DIR/windows
+windows: # Build bin to BUILD_DIR/windows
 	@GOOS=windows go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/windows/$(APP).exe
 	@echo "output build/windows/$(APP).exe"
 
