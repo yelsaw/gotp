@@ -1,4 +1,5 @@
-VERSION := 0.0.1
+VERSION := $(shell git describe --tags --abbrev=0)
+
 OS_BUILDS = linux darwin windows
 
 APP := gotp
