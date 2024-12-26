@@ -3,9 +3,9 @@ VERSION := $(shell git describe --tags --abbrev=0)
 OS_BUILDS = linux darwin windows
 
 APP := gotp
-BUILD_DIR := "build"
+BUILD_DIR := build
 
-SHA_FILE = sha256.txt
+SHA_FILE = gotp-sha256.txt
 LIC_FILE = LICENSE
 
 GO_LDFLAGS = "-s -extldflags=-static"
@@ -35,27 +35,29 @@ windows: # Build bin to BUILD_DIR/windows
 	@echo "output build/windows/$(APP).exe"
 
 archive: # Create archives for distribution
-	@echo "Creating tar/zip archives"
+	@echo "Creating tar.gz/zip archives"
 	@for os in $(OS_BUILDS); do \
-			echo "Creating zip archive for $$os"; \
+			echo "Creating $$os archive"; \
 		if [ "$$os" = "windows" ]; then \
-			cp -a $(LIC_FILE) $(BUILD_DIR)/$$os/$(LIC_FILE).txt; \
+			cp $(LIC_FILE) $(BUILD_DIR)/$$os/$(LIC_FILE).txt; \
 			zip -r $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip -j $(BUILD_DIR)/$$os/; \
 		else \
 			cp -a $(LIC_FILE) $(BUILD_DIR)/$$os/; \
-			tar -cf $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar -C $(BUILD_DIR)/$$os $(APP) $(LIC_FILE); \
+			tar -czf $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz -C $(BUILD_DIR)/$$os $(APP) $(LIC_FILE); \
 		fi \
 	done
 
 checksum: # Create sha256sum(s) for distribution
 	@echo "Creating checksum hashes"
+	@echo "" > $(BUILD_DIR)/$(SHA_FILE)
 	@for os in $(OS_BUILDS); do \
 			if [ "$$os" = "windows" ]; then \
-				sha256sum $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip > $(BUILD_DIR)/$(APP)-$$os-v$(VERSION)-$(SHA_FILE); \
+				sha256sum $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip >> $(BUILD_DIR)/$(SHA_FILE); \
 			else \
-				sha256sum $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar > $(BUILD_DIR)/$(APP)-$$os-v$(VERSION)-$(SHA_FILE); \
+				sha256sum $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz >> $(BUILD_DIR)/$(SHA_FILE); \
 			fi \
 	done
+	@sed -i 's/build\///g' $(BUILD_DIR)/$(SHA_FILE)
 
 clean: # Remove BUILD_DIR
 	@if [ -d $(BUILD_DIR) ]; then \
