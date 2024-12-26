@@ -47,6 +47,10 @@ archive: # Create archives for distribution
 		fi \
 	done
 
+	@for os in $(OS_BUILDS); do \
+		rm -rf $(BUILD_DIR)/$$os; \
+	done
+
 checksum: # Create sha256sum(s) for distribution
 	@echo "Creating checksum hashes"
 	@echo "" > $(BUILD_DIR)/$(SHA_FILE)
