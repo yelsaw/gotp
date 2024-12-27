@@ -26,15 +26,15 @@ dist: clean $(OS_BUILDS) archive checksum # Build bins, create archives, and che
 
 linux: # Build bin to BUILD_DIR/linux
 	@echo "Building build/linux/$(APP)"
-	@GOOS=linux CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/linux/$(APP)
+	@env GOOS=linux CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/linux/$(APP)
 
 darwin: # Build bin to BUILD_DIR/darwin
 	@echo "Building build/darwin/$(APP)"
-	@GOOS=darwin CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/darwin/$(APP)
+	@env GOOS=darwin CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/darwin/$(APP)
 
 windows: # Build bin to BUILD_DIR/windows
 	@echo "Building build/windows/$(APP).exe"
-	@GOOS=windows CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/windows/$(APP).exe
+	@env GOOS=windows CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/windows/$(APP).exe
 
 archive: # Create archives for distribution
 	@echo "Creating tar.gz/zip archives"
