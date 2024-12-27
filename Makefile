@@ -10,7 +10,7 @@ LIC_FILE = LICENSE
 
 GO_LDFLAGS = "-s -extldflags=-static"
 
-.PHONY: help clean build dist linux darwin windows archive checksum
+.PHONY: help build dist linux darwin windows archive checksum verify clean
 
 help:
 	@echo ""
