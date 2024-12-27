@@ -51,17 +51,22 @@ archive: # Create archives for distribution
 		rm -rf $(BUILD_DIR)/$$os; \
 	done
 
-checksum: # Create sha256sum(s) for distribution
+checksum: # Create checksum for distribution
 	@echo "Creating checksum hashes"
-	@echo "" > $(BUILD_DIR)/$(SHA_FILE)
+	@rm -f $(BUILD_DIR)/$(SHA_FILE)
+	@touch $(BUILD_DIR)/$(SHA_FILE)
 	@for os in $(OS_BUILDS); do \
 			if [ "$$os" = "windows" ]; then \
-				sha256sum $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip >> $(BUILD_DIR)/$(SHA_FILE); \
+				shasum -a 256 $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip >> $(BUILD_DIR)/$(SHA_FILE); \
 			else \
-				sha256sum $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz >> $(BUILD_DIR)/$(SHA_FILE); \
+				shasum -a 256 $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz >> $(BUILD_DIR)/$(SHA_FILE); \
 			fi \
 	done
 	@sed -i 's/build\///g' $(BUILD_DIR)/$(SHA_FILE)
+
+verify: # Verify checksums
+	@echo "Verifying checksum hashes"
+	@cd $(BUILD_DIR) && shasum -a 256 -c $(SHA_FILE)
 
 clean: # Remove BUILD_DIR
 	@if [ -d $(BUILD_DIR) ]; then \
