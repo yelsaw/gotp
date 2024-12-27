@@ -37,13 +37,12 @@ windows: # Build bin to BUILD_DIR/windows
 archive: # Create archives for distribution
 	@echo "Creating tar.gz/zip archives"
 	@for os in $(OS_BUILDS); do \
-			echo "Creating $$os archive"; \
+		echo "Creating $$os archive"; \
+		cp $(LIC_FILE) $(BUILD_DIR)/$$os/$(LIC_FILE).txt; \
 		if [ "$$os" = "windows" ]; then \
-			cp $(LIC_FILE) $(BUILD_DIR)/$$os/$(LIC_FILE).txt; \
 			zip -r $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip -j $(BUILD_DIR)/$$os/; \
 		else \
-			cp -a $(LIC_FILE) $(BUILD_DIR)/$$os/; \
-			tar -czf $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz -C $(BUILD_DIR)/$$os $(APP) $(LIC_FILE); \
+			tar -czf $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz -C $(BUILD_DIR)/$$os $(APP) $(LIC_FILE).txt; \
 		fi \
 	done
 
