@@ -23,21 +23,21 @@ build: clean $(OS_BUILDS) # Build to BUILD_DIR/{linux,darwin,windows}
 dist: clean $(OS_BUILDS) archive checksum # Build bins, create archives, and checksums
 
 linux: # Build bin to BUILD_DIR/linux
+	@echo "Building build/linux/$(APP)"
 	@GOOS=linux CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/linux/$(APP)
-	@echo "output build/linux/$(APP)"
 
 darwin: # Build bin to BUILD_DIR/darwin
-	@GOOS=darwin go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/darwin/$(APP)
-	@echo "output build/darwin/$(APP)"
+	@echo "Building build/darwin/$(APP)"
+	@GOOS=darwin CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/darwin/$(APP)
 
 windows: # Build bin to BUILD_DIR/windows
-	@GOOS=windows go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/windows/$(APP).exe
-	@echo "output build/windows/$(APP).exe"
+	@echo "Building build/windows/$(APP).exe"
+	@GOOS=windows CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/windows/$(APP).exe
 
 archive: # Create archives for distribution
 	@echo "Creating tar.gz/zip archives"
 	@for os in $(OS_BUILDS); do \
-		echo "Creating $$os archive"; \
+		echo "Archiving $$os archive"; \
 		cp $(LIC_FILE) $(BUILD_DIR)/$$os/$(LIC_FILE).txt; \
 		if [ "$$os" = "windows" ]; then \
 			zip -r $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip -j $(BUILD_DIR)/$$os/; \
