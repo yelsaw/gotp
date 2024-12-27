@@ -5,7 +5,9 @@ OS_BUILDS = linux darwin windows
 APP := gotp
 BUILD_DIR := build
 
-SHA_FILE = gotp-sha256.txt
+SHA_ALGO ?= 256
+
+SHA_FILE = gotp-sha$(SHA_ALGO).txt
 LIC_FILE = LICENSE
 
 GO_LDFLAGS = "-s -extldflags=-static"
@@ -51,21 +53,21 @@ archive: # Create archives for distribution
 	done
 
 checksum: # Create checksum for distribution
-	@echo "Creating checksum hashes"
+	@echo "Creating checksum $(SHA_ALGO) hashes"
 	@rm -f $(BUILD_DIR)/$(SHA_FILE)
 	@touch $(BUILD_DIR)/$(SHA_FILE)
 	@for os in $(OS_BUILDS); do \
 			if [ "$$os" = "windows" ]; then \
-				shasum -a 256 $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip >> $(BUILD_DIR)/$(SHA_FILE); \
+				shasum -a $(SHA_ALGO) $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip >> $(BUILD_DIR)/$(SHA_FILE); \
 			else \
-				shasum -a 256 $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz >> $(BUILD_DIR)/$(SHA_FILE); \
+				shasum -a $(SHA_ALGO) $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz >> $(BUILD_DIR)/$(SHA_FILE); \
 			fi \
 	done
 	@sed -i.del 's/build\///g' $(BUILD_DIR)/$(SHA_FILE) && rm -f $(BUILD_DIR)/$(SHA_FILE).del
 
 verify: # Verify checksums
 	@echo "Verifying checksum hashes"
-	@cd $(BUILD_DIR) && shasum -a 256 -c $(SHA_FILE)
+	@cd $(BUILD_DIR) && shasum -a $(SHA_ALGO) -c $(SHA_FILE)
 
 clean: # Remove BUILD_DIR
 	@if [ -d $(BUILD_DIR) ]; then \
