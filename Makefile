@@ -62,7 +62,7 @@ checksum: # Create checksum for distribution
 				shasum -a 256 $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz >> $(BUILD_DIR)/$(SHA_FILE); \
 			fi \
 	done
-	@sed -i 's/build\///g' $(BUILD_DIR)/$(SHA_FILE)
+	@sed -i.del 's/build\///g' $(BUILD_DIR)/$(SHA_FILE) && rm -f $(BUILD_DIR)/$(SHA_FILE).del
 
 verify: # Verify checksums
 	@echo "Verifying checksum hashes"
