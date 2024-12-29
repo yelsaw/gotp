@@ -1,15 +1,18 @@
-VERSION := 0.0.1
+VERSION := $(shell git describe --tags --abbrev=0)
+
 OS_BUILDS = linux darwin windows
 
 APP := gotp
-BUILD_DIR := "build"
+BUILD_DIR := build
 
-SHA_FILE = sha256.txt
+SHA_ALGO ?= 256
+
+SHA_FILE = gotp-sha$(SHA_ALGO).txt
 LIC_FILE = LICENSE
 
 GO_LDFLAGS = "-s -extldflags=-static"
 
-.PHONY: help clean build dist linux darwin windows archive checksum
+.PHONY: help build dist linux darwin windows archive checksum verify clean
 
 help:
 	@echo ""
@@ -17,44 +20,54 @@ help:
 	awk 'BEGIN {FS = ":.*# "; printf "  %-15s %s\n", "Command", "Description"; printf "  %-15s %s\n", "-------", "-----------"} {printf "  %-15s %s\n", $$1, $$2}'
 	@echo ""
 
-build: clean $(OS_BUILDS) # Builds all binaries to BUILD_DIR/{linux,darwin,windows}
+build: clean $(OS_BUILDS) # Build to BUILD_DIR/{linux,darwin,windows}
 
-dist: clean $(OS_BUILDS) archive checksum # Builds all binaries, archives with LIC_FILE, and creates sha256sum 
+dist: clean $(OS_BUILDS) archive checksum # Build bins, create archives, and checksums
 
-linux: # Builds binary and outputs to BUILD_DIR/linux
-	@GOOS=linux CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/linux/$(APP)
-	@echo "output build/linux/$(APP)"
+linux: # Build bin to BUILD_DIR/linux
+	@echo "Building build/linux/$(APP)"
+	@env GOOS=linux CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/linux/$(APP)
 
-darwin: # Builds binary and outputs to BUILD_DIR/darwin
-	@GOOS=darwin go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/darwin/$(APP)
-	@echo "output build/darwin/$(APP)"
+darwin: # Build bin to BUILD_DIR/darwin
+	@echo "Building build/darwin/$(APP)"
+	@env GOOS=darwin CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/darwin/$(APP)
 
-windows: # Builds binary and outputs to BUILD_DIR/windows
-	@GOOS=windows go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/windows/$(APP).exe
-	@echo "output build/windows/$(APP).exe"
+windows: # Build bin to BUILD_DIR/windows
+	@echo "Building build/windows/$(APP).exe"
+	@env GOOS=windows CGO_ENABLED=0 go build -ldflags=$(GO_LDFLAGS) -o $(BUILD_DIR)/windows/$(APP).exe
 
 archive: # Create archives for distribution
-	@echo "Creating tar/zip archives"
+	@echo "Creating tar.gz/zip archives"
 	@for os in $(OS_BUILDS); do \
-			echo "Creating zip archive for $$os"; \
+		echo "Archiving $$os archive"; \
+		cp $(LIC_FILE) $(BUILD_DIR)/$$os/$(LIC_FILE).txt; \
 		if [ "$$os" = "windows" ]; then \
-			cp -a $(LIC_FILE) $(BUILD_DIR)/$$os/$(LIC_FILE).txt; \
 			zip -r $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip -j $(BUILD_DIR)/$$os/; \
 		else \
-			cp -a $(LIC_FILE) $(BUILD_DIR)/$$os/; \
-			tar -cf $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar -C $(BUILD_DIR)/$$os $(APP) $(LIC_FILE); \
+			tar -czf $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz -C $(BUILD_DIR)/$$os $(APP) $(LIC_FILE).txt; \
 		fi \
 	done
 
-checksum: # Create sha256sum(s) for distribution
-	@echo "Creating checksum hashes"
+	@for os in $(OS_BUILDS); do \
+		rm -rf $(BUILD_DIR)/$$os; \
+	done
+
+checksum: # Create checksum for distribution
+	@echo "Creating checksum $(SHA_ALGO) hashes"
+	@rm -f $(BUILD_DIR)/$(SHA_FILE)
+	@touch $(BUILD_DIR)/$(SHA_FILE)
 	@for os in $(OS_BUILDS); do \
 			if [ "$$os" = "windows" ]; then \
-				sha256sum $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip > $(BUILD_DIR)/$(APP)-$$os-v$(VERSION)-$(SHA_FILE); \
+				shasum -a $(SHA_ALGO) $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip >> $(BUILD_DIR)/$(SHA_FILE); \
 			else \
-				sha256sum $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar > $(BUILD_DIR)/$(APP)-$$os-v$(VERSION)-$(SHA_FILE); \
+				shasum -a $(SHA_ALGO) $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz >> $(BUILD_DIR)/$(SHA_FILE); \
 			fi \
 	done
+	@sed -i.del 's/build\///g' $(BUILD_DIR)/$(SHA_FILE) && rm -f $(BUILD_DIR)/$(SHA_FILE).del
+
+verify: # Verify checksums
+	@echo "Verifying checksum hashes"
+	@cd $(BUILD_DIR) && shasum -a $(SHA_ALGO) -c $(SHA_FILE)
 
 clean: # Remove BUILD_DIR
 	@if [ -d $(BUILD_DIR) ]; then \
