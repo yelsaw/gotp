@@ -51,7 +51,7 @@ Returns:
 
 ```
 
-## Build tool
+## Build tools
 
 Build binaries from source for target OS with
  
@@ -63,18 +63,17 @@ Build binaries from source for target OS with
 
 ```
 :~/src/gotp$ make
-
   Command         Description
   -------         -----------
-  build           Builds all binaries to BUILD_DIR/{linux,darwin,windows}
-  dist            Builds all binaries, archives with LIC_FILE, and creates sha256sum
-  linux           Builds binary and outputs to BUILD_DIR/linux
-  darwin          Builds binary and outputs to BUILD_DIR/darwin
-  windows         Builds binary and outputs to BUILD_DIR/windows
+  build           Build to BUILD_DIR/{linux,darwin,windows}
+  dist            Build bins, create archives, and checksums
+  linux           Build bin to BUILD_DIR/linux
+  darwin          Build bin to BUILD_DIR/darwin
+  windows         Build bin to BUILD_DIR/windows
   archive         Create archives for distribution
-  checksum        Create sha256sum(s) for distribution
+  checksum        Create checksum for distribution
+  verify          Verify checksums
   clean           Remove BUILD_DIR
-
 ```
 
 ## AUTHOR
