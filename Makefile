@@ -1,28 +1,28 @@
 VERSION := $(shell git tag -l | tail -1)
 
-OS_BUILDS = linux darwin windows
-
 APP := gotp
 BUILD_DIR := build
-
+DIST_DIR := dist
+GO_LDFLAGS := '-s -extldflags=-static'
+LIC_FILE := LICENSE.txt
+MAKE := $(MAKE) --no-print-directory
+OS_BUILDS = linux darwin windows
 SHA_ALGO ?= 256
-
-SHA_FILE = gotp-sha$(SHA_ALGO).txt
-LIC_FILE = LICENSE
-
-GO_LDFLAGS = "-s -extldflags=-static"
+SHA_FILE := gotp-sha$(SHA_ALGO).txt
 
 .PHONY: help build dist linux darwin windows archive checksum verify clean
 
 help:
 	@echo ""
-	@grep -E '^[sa-zA-Z_-]+:.*#' $(MAKEFILE_LIST) | \
-	awk 'BEGIN {FS = ":.*# "; printf "  %-15s %s\n", "Command", "Description"; printf "  %-15s %s\n", "-------", "-----------"} {printf "  %-15s %s\n", $$1, $$2}'
+	@awk '/^[a-zA-Z_-]+:.*#/ {split($$0, a, ":.*# "); printf "  %-15s %s\n", a[1], a[2]}' $(MAKEFILE_LIST) | \
+	awk 'BEGIN {printf "  %-15s %s\n", "Command", "Description"; printf "  %-15s %s\n", "-------", "-----------"} {print}'
 	@echo ""
 
-build: clean $(OS_BUILDS) # Build to BUILD_DIR/{linux,darwin,windows}
+build: # Build to BUILD_DIR/{linux,darwin,windows}
+	@$(MAKE) clean && $(MAKE) $(OS_BUILDS)
 
-dist: clean $(OS_BUILDS) archive checksum # Build bins, create archives, and checksums
+dist: # Build bins, create archives, and checksums
+	@$(MAKE) build && $(MAKE) archive && $(MAKE) checksum
 
 linux: # Build bin to BUILD_DIR/linux
 	@echo "Building build/linux/$(APP)"
@@ -39,12 +39,15 @@ windows: # Build bin to BUILD_DIR/windows
 archive: # Create archives for distribution
 	@echo "Creating tar.gz/zip archives"
 	@for os in $(OS_BUILDS); do \
+		mkdir -p $(DIST_DIR); \
 		echo "Archiving $$os archive"; \
-		cp $(LIC_FILE) $(BUILD_DIR)/$$os/$(LIC_FILE).txt; \
+		cp LICENSE $(BUILD_DIR)/$$os/$(LIC_FILE); \
 		if [ "$$os" = "windows" ]; then \
 			zip -r $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip -j $(BUILD_DIR)/$$os/; \
+			mv $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip $(DIST_DIR)/; \
 		else \
-			tar -czf $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz -C $(BUILD_DIR)/$$os $(APP) $(LIC_FILE).txt; \
+			tar -czf $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz -C $(BUILD_DIR)/$$os $(APP) $(LIC_FILE); \
+			mv $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz $(DIST_DIR)/; \
 		fi \
 	done
 
@@ -54,24 +57,23 @@ archive: # Create archives for distribution
 
 checksum: # Create checksum for distribution
 	@echo "Creating checksum $(SHA_ALGO) hashes"
-	@rm -f $(BUILD_DIR)/$(SHA_FILE)
-	@touch $(BUILD_DIR)/$(SHA_FILE)
+	@rm -f $(DIST_DIR)/$(SHA_FILE)
+	@touch $(DIST_DIR)/$(SHA_FILE)
 	@for os in $(OS_BUILDS); do \
 			if [ "$$os" = "windows" ]; then \
-				shasum -a $(SHA_ALGO) $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip >> $(BUILD_DIR)/$(SHA_FILE); \
+				shasum -a $(SHA_ALGO) $(DIST_DIR)/$(APP)-$$os-v$(VERSION).zip >> $(DIST_DIR)/$(SHA_FILE); \
 			else \
-				shasum -a $(SHA_ALGO) $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz >> $(BUILD_DIR)/$(SHA_FILE); \
+				shasum -a $(SHA_ALGO) $(DIST_DIR)/$(APP)-$$os-v$(VERSION).tar.gz >> $(DIST_DIR)/$(SHA_FILE); \
 			fi \
 	done
-	@sed -i.del 's/build\///g' $(BUILD_DIR)/$(SHA_FILE) && rm -f $(BUILD_DIR)/$(SHA_FILE).del
+	@perl -pi -e 's/$(DIST_DIR)\///g' $(DIST_DIR)/$(SHA_FILE)
+	@rm -rf $(BUILD_DIR)
 
 verify: # Verify checksums
 	@echo "Verifying checksum hashes"
-	@cd $(BUILD_DIR) && shasum -a $(SHA_ALGO) -c $(SHA_FILE)
+	@cd $(DIST_DIR) && shasum -a $(SHA_ALGO) -c $(SHA_FILE)
 
-clean: # Remove BUILD_DIR
-	@if [ -d $(BUILD_DIR) ]; then \
-		echo "Removing $(BUILD_DIR) dir"; \
-		rm -rf $(BUILD_DIR); \
-	fi \
+clean: # Remove DIST_DIR BUILD_DIR
+	@echo "Removing $(DIST_DIR) and $(BUILD_DIR) dirs"
+	@rm -rf $(DIST_DIR) $(BUILD_DIR)
 
