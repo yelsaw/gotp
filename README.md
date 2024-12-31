@@ -73,7 +73,7 @@ Build binaries from source for target OS with
   archive         Create archives for distribution
   checksum        Create checksum for distribution
   verify          Verify checksums
-  clean           Remove BUILD_DIR
+  clean           Remove DIST_DIR BUILD_DIR
 ```
 
 ## AUTHOR
