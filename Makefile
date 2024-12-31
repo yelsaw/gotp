@@ -13,6 +13,8 @@ LIC_FILE = LICENSE
 
 GO_LDFLAGS = "-s -extldflags=-static"
 
+MAKE := $(MAKE) --no-print-directory
+
 .PHONY: help build dist linux darwin windows archive checksum verify clean
 
 help:
