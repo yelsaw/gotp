@@ -17,7 +17,7 @@ GO_LDFLAGS = "-s -extldflags=-static"
 
 help:
 	@echo ""
-	@grep -E '^[sa-zA-Z_-]+:.*#' $(MAKEFILE_LIST) | \
+	@grep -E '^[a-zA-Z_-]+:.*#' $(MAKEFILE_LIST) | \
 	awk 'BEGIN {FS = ":.*# "; printf "  %-15s %s\n", "Command", "Description"; printf "  %-15s %s\n", "-------", "-----------"} {printf "  %-15s %s\n", $$1, $$2}'
 	@echo ""
 
