@@ -1,4 +1,4 @@
-VERSION := $(shell git describe --tags --abbrev=0)
+VERSION := $(shell git describe --tags $(shell git rev-list --tags --max-count=1))
 
 OS_BUILDS = linux darwin windows
 
