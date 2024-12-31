@@ -72,6 +72,7 @@ checksum: # Create checksum for distribution
 			fi \
 	done
 	@perl -pi -e 's/$(DIST_DIR)\///g' $(DIST_DIR)/$(SHA_FILE)
+	@rm -rf $(BUILD_DIR)
 
 verify: # Verify checksums
 	@echo "Verifying checksum hashes"
