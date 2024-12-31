@@ -71,7 +71,7 @@ checksum: # Create checksum for distribution
 				shasum -a $(SHA_ALGO) $(DIST_DIR)/$(APP)-$$os-v$(VERSION).tar.gz >> $(DIST_DIR)/$(SHA_FILE); \
 			fi \
 	done
-	@sed -i.del 's/$(DIST_DIR)\///g' $(DIST_DIR)/$(SHA_FILE) && rm -f $(DIST_DIR)/$(SHA_FILE).del
+	@perl -pi -e 's/$(DIST_DIR)\///g' $(DIST_DIR)/$(SHA_FILE)
 
 verify: # Verify checksums
 	@echo "Verifying checksum hashes"
