@@ -21,9 +21,11 @@ help:
 	awk 'BEGIN {printf "  %-15s %s\n", "Command", "Description"; printf "  %-15s %s\n", "-------", "-----------"} {print}'
 	@echo ""
 
-build: clean $(OS_BUILDS) # Build to BUILD_DIR/{linux,darwin,windows}
+build: # Build to BUILD_DIR/{linux,darwin,windows}
+	@$(MAKE) clean && $(MAKE) $(OS_BUILDS)
 
-dist: clean $(OS_BUILDS) archive checksum # Build bins, create archives, and checksums
+dist: # Build bins, create archives, and checksums
+	@$(MAKE) build && $(MAKE) archive && $(MAKE) checksum
 
 linux: # Build bin to BUILD_DIR/linux
 	@echo "Building build/linux/$(APP)"
