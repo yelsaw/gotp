@@ -1,19 +1,14 @@
 VERSION := $(shell git tag -l | tail -1)
 
-OS_BUILDS = linux darwin windows
-
 APP := gotp
 BUILD_DIR := build
 DIST_DIR := dist
-
-SHA_ALGO ?= 256
-
-SHA_FILE = gotp-sha$(SHA_ALGO).txt
-LIC_FILE = LICENSE
-
-GO_LDFLAGS = "-s -extldflags=-static"
-
+GO_LDFLAGS := '-s -extldflags=-static'
+LIC_FILE := LICENSE.txt
 MAKE := $(MAKE) --no-print-directory
+OS_BUILDS = linux darwin windows
+SHA_ALGO ?= 256
+SHA_FILE := gotp-sha$(SHA_ALGO).txt
 
 .PHONY: help build dist linux darwin windows archive checksum verify clean
 
@@ -46,12 +41,12 @@ archive: # Create archives for distribution
 	@for os in $(OS_BUILDS); do \
 		mkdir -p $(DIST_DIR); \
 		echo "Archiving $$os archive"; \
-		cp $(LIC_FILE) $(BUILD_DIR)/$$os/$(LIC_FILE).txt; \
+		cp LICENSE $(BUILD_DIR)/$$os/$(LIC_FILE); \
 		if [ "$$os" = "windows" ]; then \
 			zip -r $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip -j $(BUILD_DIR)/$$os/; \
 			mv $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip $(DIST_DIR)/; \
 		else \
-			tar -czf $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz -C $(BUILD_DIR)/$$os $(APP) $(LIC_FILE).txt; \
+			tar -czf $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz -C $(BUILD_DIR)/$$os $(APP) $(LIC_FILE); \
 			mv $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).tar.gz $(DIST_DIR)/; \
 		fi \
 	done
