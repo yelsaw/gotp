@@ -4,6 +4,7 @@ import (
 	"encoding/base32"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -15,16 +16,21 @@ import (
 	"github.com/pquerna/otp/totp"
 )
 
+func cleanString(arg string) string {
+	str, _ := url.QueryUnescape(arg)
+	return str
+}
+
 func argParser(arg string) string {
 	if _, err := os.Stat(arg); err == nil {
 		data, err := os.ReadFile(arg)
 		if err != nil {
 			log.Fatalf("Unable to read known file path: %v", err)
 		}
-		return strings.TrimSpace(string(data))
+		str := strings.TrimSpace(string(data))
+		return cleanString(str)
 	}
-	// Just passing through
-	return arg
+	return cleanString(arg)
 }
 
 type messageData struct {
