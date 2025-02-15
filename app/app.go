@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"encoding/base32"
@@ -16,12 +16,36 @@ import (
 	"github.com/pquerna/otp/totp"
 )
 
+// messageData struct stores bubble tea and parsed url data.
+type messageData struct {
+	provider  string
+	secret    string
+	account   string
+	period    uint64
+	code      string
+	countdown int
+	ticker    *time.Ticker
+}
+
+// codeMsg is used in bubble tea Update() to display an OTP code
+// with additional details.
+type codeMsg struct {
+	code string
+}
+
+// errMsg is used in bubble tea Update() to display an error.
+type errMsg struct {
+	err error
+}
+
+// cleanString removes URL encoded chars from strings.
 func cleanString(arg string) string {
 	str, _ := url.QueryUnescape(arg)
 	return str
 }
 
-func argParser(arg string) string {
+// ArgParser captures a string or file path containing a URL.
+func ArgParser(arg string) string {
 	if _, err := os.Stat(arg); err == nil {
 		data, err := os.ReadFile(arg)
 		if err != nil {
@@ -33,36 +57,8 @@ func argParser(arg string) string {
 	return cleanString(arg)
 }
 
-type messageData struct {
-	provider  string
-	secret    string
-	account   string
-	period    uint64
-	code      string
-	countdown int
-	ticker    *time.Ticker
-}
-
-func main() {
-	if len(os.Args) != 2 {
-		log.Fatalf("First arg requires string or path")
-	}
-
-	url := argParser(os.Args[1])
-
-	message, err := urlParser(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if _, err := tea.NewProgram(message).Run(); err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
-}
-
-// Calls otp.NewKeyFromURL() and parses keys into messageData struct
-func urlParser(url string) (*messageData, error) {
+// UrlParser calls otp.NewKeyFromURL() and parses keys into messageData struct
+func UrlParser(url string) (*messageData, error) {
 	key, err := otp.NewKeyFromURL(url)
 	if err != nil {
 		return nil, err
@@ -85,12 +81,14 @@ func urlParser(url string) (*messageData, error) {
 	return message, nil
 }
 
+// getProvider performs rudementary URL parsing and extracts a provider (if any)
 func getProvider(url string) string {
 	colon := strings.Split(url, ":")
 	slash := strings.Split(colon[1], "/")
 	return slash[3]
 }
 
+// getCode generates a time-based code.
 func getCode(secret string) tea.Cmd {
 	return func() tea.Msg {
 		code, err := totp.GenerateCode(secret, time.Now())
@@ -101,26 +99,19 @@ func getCode(secret string) tea.Cmd {
 	}
 }
 
-type codeMsg struct {
-	code string
-}
-
-type errMsg struct {
-	err error
-}
-
+// tickCmd is used in bubble tea Init() and Update().
 func tickCmd(ticker *time.Ticker) tea.Cmd {
 	return func() tea.Msg {
 		return <-ticker.C
 	}
 }
 
-// Bubble Tea: Init()
+// Init initializes bubble tea Batch() with tickCmd() and getCode().
 func (m messageData) Init() tea.Cmd {
 	return tea.Batch(tickCmd(m.ticker), getCode(m.secret))
 }
 
-// Bubble Tea: Update()
+// Update uses bubble Update() to display messages.
 func (m messageData) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -143,7 +134,7 @@ func (m messageData) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-// Bubble Tea: View()
+// View creates the bubble tea view, i.e., the terminal message.
 func (m messageData) View() string {
 
 	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("#FFDD00"))
@@ -154,14 +145,18 @@ func (m messageData) View() string {
 	count := yellow.Render(strconv.Itoa(m.countdown))
 	const arrow = "\u2192"
 
-	text := fmt.Sprintf(`
-%s %s %s 
+	text := fmt.Sprintf(`%s %s %s
 
-Token: %s 
+Token: %s
 
 Regenerates in %s seconds
 
 Press q to quit`, account, arrow, provider, code, count)
 
 	return lipgloss.NewStyle().Padding(0, 1, 1).Render(text)
+}
+
+// GoTeaP creates a bubble tea program.
+func Interactive(message *messageData) *tea.Program {
+	return tea.NewProgram(message)
 }
