@@ -156,7 +156,7 @@ Press q to quit`, account, arrow, provider, code, count)
 	return lipgloss.NewStyle().Padding(0, 1, 1).Render(text)
 }
 
-// GoTeaP creates a bubble tea program.
+// Interactive creates a bubble tea program.
 func Interactive(message *messageData) *tea.Program {
 	return tea.NewProgram(message)
 }
