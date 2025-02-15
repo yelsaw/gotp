@@ -134,7 +134,7 @@ func (m messageData) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-// View creates the bubble tea view, i.e., the terminal message.
+// View uses bubble View() to update terminal.
 func (m messageData) View() string {
 
 	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("#FFDD00"))
