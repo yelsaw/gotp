@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	gotp "github.com/yelsaw/gotp"
+	"github.com/yelsaw/gotp"
 )
 
 func main() {

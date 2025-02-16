@@ -30,13 +30,13 @@ Clone the repo, build or run the app.
 OTP code from URL
 otpauth provided is an example of a parsed QRCode from a service.
 ```
-go run main.go "otpauth://totp/Microsoft:you@youremail.com?algorithm=SHA1&digits=6&issuer=Microsoft&period=30&secret=VXYU6YKSNBZELU23"
+go run app/gotp.go "otpauth://totp/Microsoft:you@youremail.com?algorithm=SHA1&digits=6&issuer=Microsoft&period=30&secret=VXYU6YKSNBZELU23"
 ```
-*OR* 
+*OR*
 
 Use OTP code from file path. `Make sure your file has a string similar to URL example.`
 ```
-go run main.go ~/my-otp-file-path.txt
+go run app/gotp.go ~/my-otp-file-path.txt
 ```
 
 Returns:
@@ -53,8 +53,8 @@ Returns:
 
 ## Build tools
 
-Build binaries from source for target OS with
- 
+Build binaries from source from `app/` for target OS with
+
  - `make build`
  - `make linux`
  - `make darwin`
@@ -62,7 +62,7 @@ Build binaries from source for target OS with
 
 
 ```
-:~/src/gotp$ make
+:~/src/gotp/app$ make
   Command         Description
   -------         -----------
   build           Build to BUILD_DIR/{linux,darwin,windows}
