@@ -1,4 +1,4 @@
 gotp
-main
-build
-dist
+app/build
+app/dist
+app/gotp

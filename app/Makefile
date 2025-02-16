@@ -41,7 +41,7 @@ archive: # Create archives for distribution
 	@for os in $(OS_BUILDS); do \
 		mkdir -p $(DIST_DIR); \
 		echo "Archiving $$os archive"; \
-		cp LICENSE $(BUILD_DIR)/$$os/$(LIC_FILE); \
+		cp ../LICENSE $(BUILD_DIR)/$$os/$(LIC_FILE); \
 		if [ "$$os" = "windows" ]; then \
 			zip -r $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip -j $(BUILD_DIR)/$$os/; \
 			mv $(BUILD_DIR)/$(APP)-$$os-v$(VERSION).zip $(DIST_DIR)/; \
