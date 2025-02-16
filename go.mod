@@ -2,8 +2,6 @@ module github.com/yelsaw/gotp
 
 go 1.20
 
-replace github.com/yelsaw/gotp/app => ./app
-
 require (
 	github.com/charmbracelet/bubbletea v1.3.3
 	github.com/charmbracelet/lipgloss v1.0.0
