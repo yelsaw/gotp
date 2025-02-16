@@ -16,6 +16,21 @@ import (
 	"github.com/pquerna/otp/totp"
 )
 
+var (
+	// accentColor #hex value for accent (default yellow).
+	accentColor = "#FFDD00"
+	// emailColor #hex value for email (default green).
+	emailColor = "#5CDE73"
+	// textMessage defines terminal output.
+	textMessage = `%s %s %s
+
+Token: %s
+
+Regenerates in %s seconds
+
+Press q to quit`
+)
+
 // messageData struct stores bubble tea and parsed url data.
 type messageData struct {
 	provider  string
@@ -36,6 +51,31 @@ type codeMsg struct {
 // errMsg is used in bubble tea Update() to display an error.
 type errMsg struct {
 	err error
+}
+
+// messageTheme struct contains display placeholders used in .
+type messageTheme struct {
+	accent   lipgloss.Style
+	email    lipgloss.Style
+	provider string
+	account  string
+	code     string
+	count    string
+	arrow    string
+}
+
+func initTheme(m messageData) messageTheme {
+	t := &messageTheme{
+		accent:   lipgloss.NewStyle().Foreground(lipgloss.Color(accentColor)),
+		email:    lipgloss.NewStyle().Foreground(lipgloss.Color(emailColor)),
+		provider: lipgloss.NewStyle().Bold(true).Render(m.provider),
+		arrow:    "\u2192",
+	}
+
+	t.code = t.accent.Bold(true).Render(m.code)
+	t.count = t.accent.Render(strconv.Itoa(m.countdown))
+	t.account = t.email.Render(m.account)
+	return *t
 }
 
 // cleanString removes URL encoded chars from strings.
@@ -136,23 +176,8 @@ func (m messageData) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // View uses bubble View() to update terminal.
 func (m messageData) View() string {
-
-	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("#FFDD00"))
-	lime := lipgloss.NewStyle().Foreground(lipgloss.Color("#5CDE73"))
-	provider := lipgloss.NewStyle().Bold(true).Render(m.provider)
-	account := lime.Render(m.account)
-	code := yellow.Bold(true).Render(m.code)
-	count := yellow.Render(strconv.Itoa(m.countdown))
-	const arrow = "\u2192"
-
-	text := fmt.Sprintf(`%s %s %s
-
-Token: %s
-
-Regenerates in %s seconds
-
-Press q to quit`, account, arrow, provider, code, count)
-
+	t := initTheme(m)
+	text := fmt.Sprintf(textMessage, t.account, t.arrow, t.provider, t.code, t.count)
 	return lipgloss.NewStyle().Padding(0, 1, 1).Render(text)
 }
 
