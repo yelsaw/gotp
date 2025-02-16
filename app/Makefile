@@ -1,13 +1,15 @@
-VERSION := $(shell git tag -l | tail -1)
+VERSION ?= $(shell git tag -l | tail -1)
+APP ?= gotp
+BUILD_DIR ?= build
+DIST_DIR ?= dist
+SHA_ALGO ?= 256
 
-APP := gotp
-BUILD_DIR := build
-DIST_DIR := dist
 GO_LDFLAGS := '-s -extldflags=-static'
 LIC_FILE := LICENSE.txt
 MAKE := $(MAKE) --no-print-directory
+
 OS_BUILDS = linux darwin windows
-SHA_ALGO ?= 256
+
 SHA_FILE := gotp-sha$(SHA_ALGO).txt
 
 .PHONY: help build dist linux darwin windows archive checksum verify clean
