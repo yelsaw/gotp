@@ -22,7 +22,7 @@ build: # Build to BUILD_DIR/{linux,darwin,windows}
 	@$(MAKE) clean && $(MAKE) $(OS_BUILDS)
 
 dist: # Build bins, create archives, and checksums
-	@$(MAKE) clean && $(MAKE) build && $(MAKE) archive && $(MAKE) checksum
+	@$(MAKE) build && $(MAKE) archive && $(MAKE) checksum
 
 linux: # Build bin to BUILD_DIR/linux
 	@echo "Building $(BUILD_DIR)/linux/$(APP_NAME)"
