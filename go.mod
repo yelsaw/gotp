@@ -3,7 +3,7 @@ module github.com/yelsaw/gotp
 go 1.20
 
 require (
-	github.com/charmbracelet/bubbletea v1.3.3
+	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/pquerna/otp v1.4.0
 )
