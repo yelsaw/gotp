@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/charmbracelet/lipgloss v1.1.0
-	github.com/pquerna/otp v1.4.0
+	github.com/pquerna/otp v1.5.0
 )
 
 require (
