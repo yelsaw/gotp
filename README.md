@@ -3,11 +3,6 @@
 ## Why another OTP app?
 Authy (by Twillio) stopped supporting their desktop application in mid-2024. Upon launch of the app the message "Device Removed" was received and there's no way to reconnect due to the message "The device does not meet the minimum integrity requirements," thus began the [GOTP](https://github.com/yelsaw/gotp) project for simple desktop use.
 
-## Authy Desktop Death Rattle
-|EOL |Device Removed | Min requirements |
-|-|-|-|
-|![image](https://github.com/user-attachments/assets/836ccd37-1ce5-4367-adc1-76840d2c8ada)|![image](https://github.com/user-attachments/assets/0afc6091-ef71-47c2-8ac2-3aa72352cd7f)|![image](https://github.com/user-attachments/assets/de45815f-fce7-491b-9de5-4df365c19ab1)|
-
 ## What to expect?
 This is a no frills OTP application which only supports TOTP.
 In the future this project may become more end-user friendly, but for now it's bare-bones and has no support or docs other than whatever is provided herein, which right now isn't much :)
