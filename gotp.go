@@ -53,7 +53,7 @@ type errMsg struct {
 	err error
 }
 
-// messageTheme struct contains display placeholders used in .
+// messageTheme struct contains display placeholders used in View().
 type messageTheme struct {
 	accent   lipgloss.Style
 	email    lipgloss.Style
@@ -121,7 +121,7 @@ func UrlParser(url string) (*messageData, error) {
 	return message, nil
 }
 
-// getProvider performs rudementary URL parsing and extracts a provider (if any)
+// getProvider performs rudimentary URL parsing and extracts a provider (if any)
 func getProvider(url string) string {
 	colon := strings.Split(url, ":")
 	slash := strings.Split(colon[1], "/")
