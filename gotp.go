@@ -3,7 +3,6 @@ package gotp
 import (
 	"encoding/base32"
 	"fmt"
-	"log"
 	"net/url"
 	"os"
 	"strconv"
@@ -78,40 +77,57 @@ func initTheme(m messageData) messageTheme {
 	return *t
 }
 
-// cleanString removes URL encoded chars from strings.
+// cleanString removes URL encoded chars from strings and validates input.
 func cleanString(arg string) string {
 	str, _ := url.QueryUnescape(arg)
-	return str
+	return strings.TrimSpace(str)
 }
 
 // ArgParser captures a string or file path containing a URL.
-func ArgParser(arg string) string {
-	if _, err := os.Stat(arg); err == nil {
+func ArgParser(arg string) (string, error) {
+	if arg == "" {
+		return "", fmt.Errorf("empty argument provided")
+	}
+
+	// Check if argument is a file path
+	if stat, err := os.Stat(arg); err == nil && !stat.IsDir() {
 		data, err := os.ReadFile(arg)
 		if err != nil {
-			log.Fatalf("Unable to read known file path: %v", err)
+			return "", fmt.Errorf("unable to read file: %v", err)
 		}
-		str := strings.TrimSpace(string(data))
-		return cleanString(str)
+		return cleanString(string(data)), nil
+	} else if err != nil && !os.IsNotExist(err) {
+		// If there's an error other than file not existing, return it
+		return "", fmt.Errorf("error accessing file: %v", err)
 	}
-	return cleanString(arg)
+
+	return cleanString(arg), nil
 }
 
 // UrlParser calls otp.NewKeyFromURL() and parses keys into messageData struct
-func UrlParser(url string) (*messageData, error) {
-	key, err := otp.NewKeyFromURL(url)
+func UrlParser(rawURL string) (*messageData, error) {
+	if rawURL == "" {
+		return nil, fmt.Errorf("empty URL provided")
+	}
+
+	if !strings.HasPrefix(rawURL, "otpauth://") {
+		return nil, fmt.Errorf("invalid OTP URL format, must start with otpauth://")
+	}
+
+	key, err := otp.NewKeyFromURL(rawURL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse OTP URL: %v", err)
 	}
 	secret := key.Secret()
 
-	_, err = base32.StdEncoding.DecodeString(strings.ToUpper(secret))
+	// Validate secret using Base32 (correct encoding for TOTP)
+	_, err = base32.StdEncoding.WithPadding(base32.NoPadding).DecodeString(strings.ToUpper(secret))
 	if err != nil {
-		return nil, fmt.Errorf("secret is invalid: %v", err)
+		return nil, fmt.Errorf("secret is invalid (must be Base32 encoded): %v", err)
 	}
 
 	message := &messageData{
-		provider: getProvider(url),
+		provider: getProvider(rawURL),
 		account:  key.AccountName(),
 		secret:   secret,
 		period:   key.Period(),
@@ -121,11 +137,25 @@ func UrlParser(url string) (*messageData, error) {
 	return message, nil
 }
 
-// getProvider performs rudimentary URL parsing and extracts a provider (if any)
-func getProvider(url string) string {
-	colon := strings.Split(url, ":")
-	slash := strings.Split(colon[1], "/")
-	return slash[3]
+// getProvider extracts the provider/issuer from the OTP URL using proper URL parsing.
+func getProvider(rawURL string) string {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return ""
+	}
+
+	// Try to get issuer from query parameter first
+	if issuer := u.Query().Get("issuer"); issuer != "" {
+		return issuer
+	}
+
+	// Fallback to path extraction for backward compatibility
+	pathParts := strings.Split(u.Path, ":")
+	if len(pathParts) >= 2 {
+		return strings.TrimPrefix(pathParts[0], "/")
+	}
+
+	return ""
 }
 
 // getCode generates a time-based code.
@@ -156,6 +186,7 @@ func (m messageData) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "q" {
+			m.ticker.Stop()
 			return m, tea.Quit
 		}
 	case codeMsg:
@@ -169,7 +200,8 @@ func (m messageData) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, tickCmd(m.ticker)
 	case errMsg:
-		log.Fatalf("Unable to retrieve code: %v", msg.err)
+		m.ticker.Stop()
+		return m, tea.Quit
 	}
 	return m, nil
 }

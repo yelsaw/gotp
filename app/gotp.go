@@ -14,7 +14,10 @@ func main() {
 		os.Exit(0)
 	}
 
-	url := gotp.ArgParser(os.Args[1])
+	url, err := gotp.ArgParser(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	message, err := gotp.UrlParser(url)
 	if err != nil {
